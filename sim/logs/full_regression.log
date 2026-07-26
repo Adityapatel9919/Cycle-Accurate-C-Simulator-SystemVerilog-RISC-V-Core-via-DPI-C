@@ -1,0 +1,58 @@
+
+Loading program:                                                                                                                                                                                                                               tests/directed/full_regression.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/full_regression.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 10
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+FULL DIRECTED REGRESSION
+----------------------------------------
+[PASS] x1 = 10 (0x0000000a)
+[PASS] x2 = 20 (0x00000014)
+[PASS] x3 = 30 (0x0000001e)
+[PASS] x4 = 20 (0x00000014)
+[PASS] x5 = 20 (0x00000014)
+[PASS] x6 = 40 (0x00000028)
+[PASS] x7 = 7 (0x00000007)
+[PASS] x8 = 0 (0x00000000)
+[PASS] x9 = 9 (0x00000009)
+[PASS] x10 = 10 (0x0000000a)
+[PASS] x11 = 11 (0x0000000b)
+[PASS] x12 = -1 (0xffffffff)
+[PASS] x13 = 1 (0x00000001)
+[PASS] x14 = 14 (0x0000000e)
+[PASS] x15 = 15 (0x0000000f)
+[PASS] x16 = 16 (0x00000010)
+[PASS] x17 = 17 (0x00000011)
+[PASS] x18 = 18 (0x00000012)
+[PASS] x20 = 124 (0x0000007c)
+[PASS] x19 = 156 (0x0000009c)
+[PASS] x21 = 148 (0x00000094)
+[PASS] x22 = 22 (0x00000016)
+[PASS] Load-use stalls = 1
+[PASS] Control redirects = 7
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 1
+Control redirects : 7
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 10
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

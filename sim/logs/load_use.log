@@ -1,0 +1,39 @@
+
+Loading program:                                                                                                                                                                                                                                      tests/directed/load_use.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/load_use.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 4
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+LOAD-USE HAZARD TEST
+----------------------------------------
+[PASS] x1 = 42 (0x0000002a)
+[PASS] x5 = 42 (0x0000002a)
+[PASS] x6 = 84 (0x00000054)
+[PASS] Load-use stall detected
+       Stall count = 1
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 1
+Control redirects : 0
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 4
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

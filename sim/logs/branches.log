@@ -1,0 +1,43 @@
+
+Loading program:                                                                                                                                                                                                                                      tests/directed/branches.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/branches.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 7
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+BRANCH INSTRUCTION TEST
+----------------------------------------
+[PASS] x1 = 10 (0x0000000a)
+[PASS] x2 = 20 (0x00000014)
+[PASS] x3 = 3 (0x00000003)
+[PASS] x4 = -1 (0xffffffff)
+[PASS] x5 = 1 (0x00000001)
+[PASS] x6 = 6 (0x00000006)
+[PASS] x7 = 7 (0x00000007)
+[PASS] x8 = 8 (0x00000008)
+[PASS] x9 = 9 (0x00000009)
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 0
+Control redirects : 3
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 7
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

@@ -1,0 +1,39 @@
+
+Loading program:                                                                                                                                                                                                                                    tests/directed/forwarding.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/forwarding.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 2
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+FORWARDING TEST
+----------------------------------------
+[PASS] x1 = 5 (0x00000005)
+[PASS] x2 = 10 (0x0000000a)
+[PASS] x3 = 15 (0x0000000f)
+[PASS] x4 = 25 (0x00000019)
+[PASS] x5 = 40 (0x00000028)
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 0
+Control redirects : 0
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 2
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

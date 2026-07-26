@@ -1,0 +1,39 @@
+
+Loading program:                                                                                                                                                                                                                                           tests/directed/jal.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/jal.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 8
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+JAL TEST
+----------------------------------------
+[PASS] x1 = 4 (0x00000004)
+[PASS] x2 = 0 (0x00000000)
+[PASS] x3 = 0 (0x00000000)
+[PASS] x4 = 42 (0x0000002a)
+[PASS] JAL redirect detected
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 0
+Control redirects : 1
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 8
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

@@ -1,0 +1,40 @@
+
+Loading program:                                                                                                                                                                                                                                     tests/directed/beq_taken.hex
+
+WARNING: rtl/memory/instruction_memory.sv:75: $readmemh(tests/directed/beq_taken.hex): Not enough words in the file for the requested range [0:1023].
+VCD info: dumpfile waves/top.vcd opened for output.
+
+==================================================
+       RV32I 5-STAGE PIPELINE TEST
+==================================================
+TEST_ID = 5
+
+
+----------------------------------------
+ARCHITECTURAL x0 CHECK
+----------------------------------------
+[PASS] x0 = 0 (0x00000000)
+
+----------------------------------------
+BEQ TAKEN TEST
+----------------------------------------
+[PASS] x1 = 10 (0x0000000a)
+[PASS] x2 = 10 (0x0000000a)
+[PASS] x3 = 0 (0x00000000)
+[PASS] x4 = 0 (0x00000000)
+[PASS] x5 = 42 (0x0000002a)
+[PASS] BEQ redirect detected
+
+----------------------------------------
+PIPELINE STATISTICS
+----------------------------------------
+Cycles            : 101
+Load-use stalls   : 0
+Control redirects : 1
+
+==================================================
+ALL TESTS PASSED
+TEST_ID: 5
+==================================================
+
+tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)

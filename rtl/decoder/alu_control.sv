@@ -6,7 +6,8 @@ module alu_control (
     output logic [3:0] alu_ctrl
 );
 
-always_comb begin
+always_comb
+ begin
 
     case (alu_op)
 
