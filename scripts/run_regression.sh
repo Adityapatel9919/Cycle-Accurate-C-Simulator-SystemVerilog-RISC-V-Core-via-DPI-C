@@ -83,6 +83,7 @@ rtl/pipeline/mem_wb.sv \
 rtl/hazard/forwarding_unit.sv \
 rtl/hazard/hazard_unit.sv \
 rtl/core/top.sv \
+tb/assertions/pipeline_assertions.sv \
 tb/basic/top_tb.sv
 
 

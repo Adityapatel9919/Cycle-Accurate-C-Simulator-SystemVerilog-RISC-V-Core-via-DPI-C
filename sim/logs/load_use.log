@@ -9,6 +9,98 @@ VCD info: dumpfile waves/top.vcd opened for output.
 ==================================================
 TEST_ID = 4
 
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
+[ASSERT INFO] Register write requested for x0; write must be ignored
 
 ----------------------------------------
 ARCHITECTURAL x0 CHECK
@@ -36,4 +128,12 @@ ALL TESTS PASSED
 TEST_ID: 4
 ==================================================
 
-tb/basic/top_tb.sv:797: $finish called at 1026000 (1ps)
+tb/basic/top_tb.sv:829: $finish called at 1026000 (1ps)
+
+==================================================
+            ASSERTION SUMMARY
+==================================================
+Assertion failures : 0
+ASSERTIONS PASSED
+==================================================
+

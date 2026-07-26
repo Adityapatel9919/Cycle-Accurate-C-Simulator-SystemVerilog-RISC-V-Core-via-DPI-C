@@ -26,6 +26,38 @@ module top_tb;
         .rst (rst)
     );
 
+pipeline_assertions assertions_inst (
+
+    .clk                (clk),
+    .rst                (rst),
+
+    .pc                 (dut.pc_current),
+
+    .x0_value           (dut.regfile_inst.regs[0]),
+
+    .pc_write           (dut.pc_write),
+    .if_id_write        (dut.if_id_write),
+    .id_ex_flush        (dut.id_ex_flush),
+
+    .control_transfer   (dut.control_transfer_ex),
+    .if_id_flush        (dut.if_id_flush),
+
+    .forward_a          (dut.forward_a),
+    .forward_b          (dut.forward_b),
+
+    .id_ex_rs1          (dut.id_ex_rs1),
+    .id_ex_rs2          (dut.id_ex_rs2),
+
+    .ex_mem_rd          (dut.ex_mem_rd),
+    .ex_mem_reg_write   (dut.ex_mem_reg_write),
+
+    .mem_wb_rd          (dut.mem_wb_rd),
+    .mem_wb_reg_write   (dut.mem_wb_reg_write),
+
+    .wb_reg_write       (dut.mem_wb_reg_write),
+    .wb_rd              (dut.mem_wb_rd)
+
+);
 
     // ============================================================
     // CLOCK
