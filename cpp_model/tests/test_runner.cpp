@@ -84,7 +84,74 @@ bool checkRegister(
 // ============================================================
 // RUN ONE TEST
 // ============================================================
+void printCommit(const CommitInfo& commit)
+{
+    if (!commit.valid) {
+        return;
+    }
 
+    std::cout
+        << "COMMIT"
+        << " PC=0x"
+        << std::hex
+        << std::setw(8)
+        << std::setfill('0')
+        << commit.pc
+
+        << " INSTR=0x"
+        << std::setw(8)
+        << commit.instruction;
+
+
+    if (commit.regWrite) {
+
+        std::cout
+            << " RD=x"
+            << std::dec
+            << static_cast<unsigned>(
+                commit.rd
+            )
+
+            << " VALUE=0x"
+            << std::hex
+            << std::setw(8)
+            << std::setfill('0')
+            << commit.rdValue;
+    }
+
+
+    if (commit.memWrite) {
+
+        std::cout
+            << " MEM_ADDR=0x"
+            << std::hex
+            << std::setw(8)
+            << std::setfill('0')
+            << commit.memAddress
+
+            << " MEM_VALUE=0x"
+            << std::setw(8)
+            << commit.memValue
+
+            << " MEM_SIZE="
+            << std::dec
+            << static_cast<unsigned>(
+                commit.memWriteSize
+            );
+    }
+
+
+    std::cout
+        << " NEXT_PC=0x"
+        << std::hex
+        << std::setw(8)
+        << std::setfill('0')
+        << commit.nextPC
+
+        << std::dec
+        << std::setfill(' ')
+        << '\n';
+}
 bool runTest(const TestCase& test)
 {
     std::cout
@@ -269,9 +336,12 @@ int main()
             "tests/directed/forwarding.hex",
 
             {
-                {1, 10},
-                {2, 20},
-                {3, 30}
+               
+        {1, 5},
+        {2, 10},
+        {3, 15},
+        {4, 25},
+        {5, 40}
             }
         },
 
@@ -286,8 +356,8 @@ int main()
             "tests/directed/load_store.hex",
 
             {
-                {1, 42},
-                {5, 42}
+                 {1, 42},
+        {2, 42}
             }
         },
 
@@ -385,8 +455,10 @@ int main()
             "tests/directed/jal.hex",
 
             {
-                {18, 18},
-                {20, 124}
+                {1, 4},
+        {2, 0},
+        {3, 0},
+        {4, 42}
             }
         },
 
@@ -401,11 +473,36 @@ int main()
             "tests/directed/jalr.hex",
 
             {
-                {19, 156},
-                {21, 148},
-                {22, 22}
+                {1, 20},
+        {2, 0},
+        {3, 0},
+        {4, 42},
+        {5, 12}
             }
-        }
+        },
+        {
+    "full_regression",
+    "tests/directed/full_regression.hex",
+    {
+        {1,  10},
+        {2,  20},
+        {3,  30},
+        {4,  20},
+        {5,  20},
+
+        {16, 16},
+        {17, 17},
+
+        {18, 18},
+        {20, 124},
+
+        {19, 156},
+        {21, 148},
+        {22, 22}
+    },
+
+    500
+}
     };
 
 

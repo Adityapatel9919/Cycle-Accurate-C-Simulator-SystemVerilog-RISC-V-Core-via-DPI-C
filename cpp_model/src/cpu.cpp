@@ -30,6 +30,8 @@ void CPU::reset(uint32_t resetPC)
     registers.fill(0);
 
     instructionCount = 0;
+
+    lastCommit = CommitInfo{};
 }
 
 
@@ -68,10 +70,16 @@ void CPU::setRegister(
 )
 {
     if (index >= NUM_REGISTERS) {
-        throw std::out_of_range("Invalid register index");
+        throw std::out_of_range(
+            "Invalid register index"
+        );
     }
 
-    writeRegister(index, value);
+    if (index != 0) {
+        registers[index] = value;
+    }
+
+    registers[0] = 0;
 }
 
 
@@ -85,15 +93,40 @@ void CPU::writeRegister(
 )
 {
     if (rd >= NUM_REGISTERS) {
-        throw std::out_of_range("Invalid destination register");
+        throw std::out_of_range(
+            "Invalid destination register"
+        );
     }
 
-    // x0 cannot be modified.
-    if (rd != 0) {
-        registers[rd] = value;
+    // ========================================================
+    // x0 IS HARDWIRED TO ZERO
+    // ========================================================
+
+    if (rd == 0) {
+        registers[0] = 0;
+        return;
     }
 
-    // Defensive enforcement of architectural x0.
+
+    // ========================================================
+    // ARCHITECTURAL WRITEBACK
+    // ========================================================
+
+    registers[rd] = value;
+
+
+    // ========================================================
+    // COMMIT INFORMATION
+    // ========================================================
+
+    lastCommit.regWrite = true;
+
+    lastCommit.rd = rd;
+
+    lastCommit.rdValue = value;
+
+
+    // Defensive x0 enforcement
     registers[0] = 0;
 }
 
@@ -114,14 +147,26 @@ uint64_t CPU::getInstructionCount() const
 
 bool CPU::step()
 {
-    // --------------------------------------------------------
+    // ========================================================
+    // CLEAR PREVIOUS COMMIT
+    // ========================================================
+
+    lastCommit = CommitInfo{};
+
+
+    // ========================================================
     // FETCH
-    // --------------------------------------------------------
+    // ========================================================
+
+    const uint32_t instructionPC = pc;
 
     uint32_t rawInstruction = 0;
 
     try {
-        rawInstruction = memory.read32(pc);
+
+        rawInstruction =
+            memory.read32(instructionPC);
+
     }
     catch (const std::exception& e) {
 
@@ -130,7 +175,7 @@ bool CPU::step()
             << std::hex
             << std::setw(8)
             << std::setfill('0')
-            << pc
+            << instructionPC
             << std::dec
             << ": "
             << e.what()
@@ -140,12 +185,13 @@ bool CPU::step()
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // DECODE
-    // --------------------------------------------------------
+    // ========================================================
 
     DecodedInstruction instruction =
         Decoder::decode(rawInstruction);
+
 
     if (!instruction.valid) {
 
@@ -157,7 +203,7 @@ bool CPU::step()
             << rawInstruction
             << " at PC 0x"
             << std::setw(8)
-            << pc
+            << instructionPC
             << std::dec
             << '\n';
 
@@ -165,26 +211,67 @@ bool CPU::step()
     }
 
 
-    // --------------------------------------------------------
-    // EXECUTE
-    // --------------------------------------------------------
+    // ========================================================
+    // INITIALISE COMMIT RECORD
+    // ========================================================
 
-    if (!execute(instruction)) {
+    lastCommit.pc =
+        instructionPC;
+
+    lastCommit.instruction =
+        rawInstruction;
+
+
+    // ========================================================
+    // EXECUTE
+    // ========================================================
+
+    try {
+
+        if (!execute(instruction)) {
+            return false;
+        }
+
+    }
+    catch (const std::exception& e) {
+
+        std::cerr
+            << "Execution failed at PC 0x"
+            << std::hex
+            << std::setw(8)
+            << std::setfill('0')
+            << instructionPC
+            << std::dec
+            << ": "
+            << e.what()
+            << '\n';
+
+        lastCommit = CommitInfo{};
+
         return false;
     }
 
 
-    // --------------------------------------------------------
-    // Architectural x0 enforcement
-    // --------------------------------------------------------
+    // ========================================================
+    // ARCHITECTURAL x0 ENFORCEMENT
+    // ========================================================
 
     registers[0] = 0;
+
+
+    // ========================================================
+    // COMPLETE COMMIT RECORD
+    // ========================================================
+
+    lastCommit.nextPC = pc;
+
+    lastCommit.valid = true;
+
 
     ++instructionCount;
 
     return true;
 }
-
 
 // ============================================================
 // RUN
@@ -664,50 +751,96 @@ void CPU::executeStore(
 
     switch (instruction.operation) {
 
-        // ----------------------------------------------------
+        // ====================================================
         // SB
-        // ----------------------------------------------------
+        // ====================================================
 
         case Operation::SB:
+        {
+            const uint8_t storeValue =
+                static_cast<uint8_t>(
+                    value & 0xFF
+                );
 
             memory.write8(
                 address,
-                static_cast<uint8_t>(
-                    value & 0xFF
-                )
+                storeValue
             );
 
+
+            lastCommit.memWrite = true;
+
+            lastCommit.memAddress =
+                address;
+
+            lastCommit.memValue =
+                static_cast<uint32_t>(
+                    storeValue
+                );
+
+            lastCommit.memWriteSize = 1;
+
             break;
+        }
 
 
-        // ----------------------------------------------------
+        // ====================================================
         // SH
-        // ----------------------------------------------------
+        // ====================================================
 
         case Operation::SH:
+        {
+            const uint16_t storeValue =
+                static_cast<uint16_t>(
+                    value & 0xFFFF
+                );
 
             memory.write16(
                 address,
-                static_cast<uint16_t>(
-                    value & 0xFFFF
-                )
+                storeValue
             );
 
+
+            lastCommit.memWrite = true;
+
+            lastCommit.memAddress =
+                address;
+
+            lastCommit.memValue =
+                static_cast<uint32_t>(
+                    storeValue
+                );
+
+            lastCommit.memWriteSize = 2;
+
             break;
+        }
 
 
-        // ----------------------------------------------------
+        // ====================================================
         // SW
-        // ----------------------------------------------------
+        // ====================================================
 
         case Operation::SW:
-
+        {
             memory.write32(
                 address,
                 value
             );
 
+
+            lastCommit.memWrite = true;
+
+            lastCommit.memAddress =
+                address;
+
+            lastCommit.memValue =
+                value;
+
+            lastCommit.memWriteSize = 4;
+
             break;
+        }
 
 
         default:
@@ -720,8 +853,6 @@ void CPU::executeStore(
 
     pc += 4;
 }
-
-
 // ============================================================
 // BRANCH OPERATIONS
 // ============================================================
@@ -1037,4 +1168,8 @@ void CPU::dumpRegisters() const
         << instructionCount
         << '\n'
         << "========================================\n";
+}
+const CommitInfo& CPU::getLastCommit() const
+{
+    return lastCommit;
 }

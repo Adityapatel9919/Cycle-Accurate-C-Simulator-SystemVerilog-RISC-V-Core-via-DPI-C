@@ -207,31 +207,46 @@ bool Memory::loadHexFile(
         return false;
     }
 
+    // ========================================================
+    // INITIALISE PROGRAM METADATA
+    // ========================================================
+
+    programStart = baseAddress;
+    programEnd = baseAddress;
+    programWordCount = 0;
+
+
     std::string line;
 
     uint32_t address = baseAddress;
 
     std::size_t wordsLoaded = 0;
 
+
+    // ========================================================
+    // LOAD HEX FILE
+    // ========================================================
+
     while (std::getline(file, line)) {
 
         // Ignore empty lines
-
-        if (line.empty())
+        if (line.empty()) {
             continue;
+        }
 
         // Ignore comment lines
-
-        if (line[0] == '#')
+        if (line[0] == '#') {
             continue;
+        }
+
 
         uint32_t instruction = 0;
 
         std::stringstream ss;
 
         ss << std::hex << line;
-
         ss >> instruction;
+
 
         if (ss.fail()) {
 
@@ -243,6 +258,11 @@ bool Memory::loadHexFile(
             return false;
         }
 
+
+        // ----------------------------------------------------
+        // Bounds check
+        // ----------------------------------------------------
+
         if (!isValidAddress(address, 4)) {
 
             std::cerr
@@ -251,15 +271,37 @@ bool Memory::loadHexFile(
             return false;
         }
 
+
+        // ----------------------------------------------------
+        // Store instruction
+        // ----------------------------------------------------
+
         write32(
             address,
             instruction
         );
 
+
         address += 4;
 
         ++wordsLoaded;
     }
+
+
+    // ========================================================
+    // SAVE PROGRAM METADATA
+    // ========================================================
+
+    programStart = baseAddress;
+
+    programEnd = address;
+
+    programWordCount = wordsLoaded;
+
+
+    // ========================================================
+    // REPORT
+    // ========================================================
 
     std::cout
         << "Loaded "
@@ -267,6 +309,7 @@ bool Memory::loadHexFile(
         << " instructions from "
         << filename
         << '\n';
+
 
     return true;
 }
