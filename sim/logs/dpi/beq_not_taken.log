@@ -1,0 +1,48 @@
+
+Loading program:                                                                                                                                                                                                                                 tests/directed/beq_not_taken.hex
+
+
+==================================================
+       RV32I DPI LOCKSTEP VERIFICATION
+==================================================
+
+[DPI TB] Program: tests/directed/beq_not_taken.hex
+Loaded 8 instructions from tests/directed/beq_not_taken.hex
+[DPI] Golden model initialized: tests/directed/beq_not_taken.hex
+[DPI TB] Reset released
+
+COMMIT PC=0x00000000 INSTR=0x00a00093 RD=x1 VALUE=0x0000000a
+[DPI PASS] Commit 1 PC=0x00000000
+COMMIT PC=0x00000004 INSTR=0x01400113 RD=x2 VALUE=0x00000014
+[DPI PASS] Commit 2 PC=0x00000004
+COMMIT PC=0x00000008 INSTR=0x00208663 RD=- VALUE=-
+[DPI PASS] Commit 3 PC=0x00000008
+COMMIT PC=0x0000000c INSTR=0x02100193 RD=x3 VALUE=0x00000021
+[DPI PASS] Commit 4 PC=0x0000000c
+COMMIT PC=0x00000010 INSTR=0x02c00213 RD=x4 VALUE=0x0000002c
+[DPI PASS] Commit 5 PC=0x00000010
+COMMIT PC=0x00000014 INSTR=0x03700293 RD=x5 VALUE=0x00000037
+[DPI PASS] Commit 6 PC=0x00000014
+COMMIT PC=0x00000018 INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 7 PC=0x00000018
+COMMIT PC=0x0000001c INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 8 PC=0x0000001c
+
+==================================================
+       DPI LOCKSTEP VERIFICATION PASSED
+==================================================
+Commits    : 8
+Mismatches : 0
+==================================================
+
+==================================================
+              DPI TEST PASSED
+==================================================
+Cycles  : 11
+Commits : 8
+==================================================
+
+- tb/dpi/dpi_tb.sv:303: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.048 2026-04-26
+- Verilator: $finish at 155ns; walltime 0.001 s; speed 237.366 us/s
+- Verilator: cpu 0.001 s on 1 threads; allocated 3 MB

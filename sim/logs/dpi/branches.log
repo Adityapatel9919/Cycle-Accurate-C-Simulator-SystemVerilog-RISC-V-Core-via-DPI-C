@@ -1,0 +1,66 @@
+
+Loading program:                                                                                                                                                                                                                                      tests/directed/branches.hex
+
+
+==================================================
+       RV32I DPI LOCKSTEP VERIFICATION
+==================================================
+
+[DPI TB] Program: tests/directed/branches.hex
+Loaded 20 instructions from tests/directed/branches.hex
+[DPI] Golden model initialized: tests/directed/branches.hex
+[DPI TB] Reset released
+
+COMMIT PC=0x00000000 INSTR=0x00a00093 RD=x1 VALUE=0x0000000a
+[DPI PASS] Commit 1 PC=0x00000000
+COMMIT PC=0x00000004 INSTR=0x01400113 RD=x2 VALUE=0x00000014
+[DPI PASS] Commit 2 PC=0x00000004
+COMMIT PC=0x00000008 INSTR=0x00209463 RD=- VALUE=-
+[DPI PASS] Commit 3 PC=0x00000008
+COMMIT PC=0x00000010 INSTR=0x00300193 RD=x3 VALUE=0x00000003
+[DPI PASS] Commit 4 PC=0x00000010
+COMMIT PC=0x00000014 INSTR=0xfff00213 RD=x4 VALUE=0xffffffff
+[DPI PASS] Commit 5 PC=0x00000014
+COMMIT PC=0x00000018 INSTR=0x00100293 RD=x5 VALUE=0x00000001
+[DPI PASS] Commit 6 PC=0x00000018
+COMMIT PC=0x0000001c INSTR=0x00524463 RD=- VALUE=-
+[DPI PASS] Commit 7 PC=0x0000001c
+COMMIT PC=0x00000024 INSTR=0x00600313 RD=x6 VALUE=0x00000006
+[DPI PASS] Commit 8 PC=0x00000024
+COMMIT PC=0x00000028 INSTR=0x0042d463 RD=- VALUE=-
+[DPI PASS] Commit 9 PC=0x00000028
+COMMIT PC=0x00000030 INSTR=0x00700393 RD=x7 VALUE=0x00000007
+[DPI PASS] Commit 10 PC=0x00000030
+COMMIT PC=0x00000034 INSTR=0x00526463 RD=- VALUE=-
+[DPI PASS] Commit 11 PC=0x00000034
+COMMIT PC=0x00000038 INSTR=0x00800413 RD=x8 VALUE=0x00000008
+[DPI PASS] Commit 12 PC=0x00000038
+COMMIT PC=0x0000003c INSTR=0x0042f463 RD=- VALUE=-
+[DPI PASS] Commit 13 PC=0x0000003c
+COMMIT PC=0x00000040 INSTR=0x06300493 RD=x9 VALUE=0x00000063
+[DPI PASS] Commit 14 PC=0x00000040
+COMMIT PC=0x00000044 INSTR=0x00900493 RD=x9 VALUE=0x00000009
+[DPI PASS] Commit 15 PC=0x00000044
+COMMIT PC=0x00000048 INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 16 PC=0x00000048
+COMMIT PC=0x0000004c INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 17 PC=0x0000004c
+
+==================================================
+       DPI LOCKSTEP VERIFICATION PASSED
+==================================================
+Commits    : 17
+Mismatches : 0
+==================================================
+
+==================================================
+              DPI TEST PASSED
+==================================================
+Cycles  : 26
+Commits : 17
+==================================================
+
+- tb/dpi/dpi_tb.sv:303: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.048 2026-04-26
+- Verilator: $finish at 305ns; walltime 0.001 s; speed 461.422 us/s
+- Verilator: cpu 0.001 s on 1 threads; allocated 3 MB

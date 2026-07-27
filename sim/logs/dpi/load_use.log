@@ -1,0 +1,44 @@
+
+Loading program:                                                                                                                                                                                                                                      tests/directed/load_use.hex
+
+
+==================================================
+       RV32I DPI LOCKSTEP VERIFICATION
+==================================================
+
+[DPI TB] Program: tests/directed/load_use.hex
+Loaded 6 instructions from tests/directed/load_use.hex
+[DPI] Golden model initialized: tests/directed/load_use.hex
+[DPI TB] Reset released
+
+COMMIT PC=0x00000000 INSTR=0x02a00093 RD=x1 VALUE=0x0000002a
+[DPI PASS] Commit 1 PC=0x00000000
+COMMIT PC=0x00000004 INSTR=0x00102023 RD=- VALUE=-
+[DPI PASS] Commit 2 PC=0x00000004
+COMMIT PC=0x00000008 INSTR=0x00002283 RD=x5 VALUE=0x0000002a
+[DPI PASS] Commit 3 PC=0x00000008
+COMMIT PC=0x0000000c INSTR=0x00528333 RD=x6 VALUE=0x00000054
+[DPI PASS] Commit 4 PC=0x0000000c
+COMMIT PC=0x00000010 INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 5 PC=0x00000010
+COMMIT PC=0x00000014 INSTR=0x00000013 RD=- VALUE=-
+[DPI PASS] Commit 6 PC=0x00000014
+
+==================================================
+       DPI LOCKSTEP VERIFICATION PASSED
+==================================================
+Commits    : 6
+Mismatches : 0
+==================================================
+
+==================================================
+              DPI TEST PASSED
+==================================================
+Cycles  : 10
+Commits : 6
+==================================================
+
+- tb/dpi/dpi_tb.sv:303: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.048 2026-04-26
+- Verilator: $finish at 145ns; walltime 0.001 s; speed 211.370 us/s
+- Verilator: cpu 0.001 s on 1 threads; allocated 3 MB

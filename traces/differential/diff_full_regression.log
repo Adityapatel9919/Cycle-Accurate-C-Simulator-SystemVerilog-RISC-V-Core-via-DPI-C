@@ -1,0 +1,18 @@
+==================================================
+       RV32I DIFFERENTIAL VERIFICATION
+==================================================
+
+RTL trace      : traces/differential/rtl_full_regression.log
+C++ trace      : traces/differential/cpp_full_regression.log
+RTL commits    : 81
+C++ commits    : 32
+Compare count  : 32
+
+==================================================
+       DIFFERENTIAL VERIFICATION PASSED
+==================================================
+
+Commits compared : 32
+Mismatches       : 0
+
+==================================================
