@@ -1,7 +1,13 @@
 module top (
     input logic clk,
-    input logic rst
-   
+    input logic rst,
+    output logic        commit_valid,
+    output logic [31:0] commit_pc,
+    output logic [31:0] commit_instr,
+
+    output logic        commit_reg_write,
+    output logic [4:0]  commit_rd,
+    output logic [31:0] commit_rd_value
 );
 
     // ============================================================
@@ -185,7 +191,7 @@ logic mem_wb_valid;
 
     logic       ex_mem_reg_write;
     logic [1:0] ex_mem_wb_sel;
-
+    
 
     // ============================================================
     // MEM STAGE
@@ -713,38 +719,48 @@ id_ex id_ex_inst (
     // ============================================================
 
     ex_mem ex_mem_inst (
-        .clk            (clk),
-        .rst            (rst),
-        .flush          (1'b0),
+    .clk            (clk),
+    .rst            (rst),
+    .flush          (1'b0),
 
-        .alu_result_in  (alu_result_ex),
+    // Trace metadata
+    .valid_in       (id_ex_valid),
+    .pc_in          (id_ex_pc),
+    .instr_in       (id_ex_instr),
 
-        // Store data must also use forwarding.
-        .rs2_data_in    (forwarded_rs2),
+    // EX data
+    .alu_result_in  (alu_result_ex),
+    .rs2_data_in    (forwarded_rs2),
+    .pc_plus4_in    (id_ex_pc_plus4),
+    .rd_in          (id_ex_rd),
 
-        .pc_plus4_in    (id_ex_pc_plus4),
+    // MEM control
+    .mem_read_in    (id_ex_mem_read),
+    .mem_write_in   (id_ex_mem_write),
 
-        .rd_in          (id_ex_rd),
+    // WB control
+    .reg_write_in   (id_ex_reg_write),
+    .wb_sel_in      (id_ex_wb_sel),
 
-        .mem_read_in    (id_ex_mem_read),
-        .mem_write_in   (id_ex_mem_write),
+    // Trace outputs
+    .valid_out      (ex_mem_valid),
+    .pc_out         (ex_mem_pc),
+    .instr_out      (ex_mem_instr),
 
-        .reg_write_in   (id_ex_reg_write),
-        .wb_sel_in      (id_ex_wb_sel),
+    // Data outputs
+    .alu_result_out (ex_mem_alu_result),
+    .rs2_data_out   (ex_mem_rs2_data),
+    .pc_plus4_out   (ex_mem_pc_plus4),
+    .rd_out         (ex_mem_rd),
 
-        .alu_result_out (ex_mem_alu_result),
-        .rs2_data_out   (ex_mem_rs2_data),
+    // MEM control outputs
+    .mem_read_out   (ex_mem_mem_read),
+    .mem_write_out  (ex_mem_mem_write),
 
-        .pc_plus4_out   (ex_mem_pc_plus4),
-
-        .rd_out         (ex_mem_rd),
-
-        .mem_read_out   (ex_mem_mem_read),
-        .mem_write_out  (ex_mem_mem_write),
-
-        .reg_write_out  (ex_mem_reg_write),
-        .wb_sel_out     (ex_mem_wb_sel)
-    );
+    // WB control outputs
+    .reg_write_out  (ex_mem_reg_write),
+    .wb_sel_out     (ex_mem_wb_sel)
+);
 
 
     // ============================================================
@@ -804,5 +820,20 @@ id_ex id_ex_inst (
     .reg_write_out  (mem_wb_reg_write),
     .wb_sel_out     (mem_wb_wb_sel)
 );
+always_comb begin
+
+    commit_valid     = mem_wb_valid;
+    commit_pc        = mem_wb_pc;
+    commit_instr     = mem_wb_instr;
+
+    commit_reg_write = mem_wb_valid
+                     && mem_wb_reg_write
+                     && (mem_wb_rd != 5'd0);
+
+    commit_rd        = mem_wb_rd;
+
+    commit_rd_value  = writeback_data;
+
+end
 
 endmodule

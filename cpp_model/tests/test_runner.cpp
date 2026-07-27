@@ -25,7 +25,8 @@ struct TestCase
 
     std::vector<RegisterExpectation> expectations;
 
-    std::size_t maxInstructions = 200;
+    // Number of architectural instructions expected to retire.
+    std::size_t instructionCount;
 };
 
 
@@ -62,7 +63,6 @@ bool checkRegister(
         return false;
     }
 
-
     std::cout
         << "[PASS] x"
         << static_cast<unsigned>(reg)
@@ -82,9 +82,10 @@ bool checkRegister(
 
 
 // ============================================================
-// RUN ONE TEST
+// COMMIT TRACE
 // ============================================================
-void printCommit(const CommitInfo& commit)
+
+void printCommit(const Commit& commit)
 {
     if (!commit.valid) {
         return;
@@ -102,15 +103,12 @@ void printCommit(const CommitInfo& commit)
         << std::setw(8)
         << commit.instruction;
 
-
     if (commit.regWrite) {
 
         std::cout
             << " RD=x"
             << std::dec
-            << static_cast<unsigned>(
-                commit.rd
-            )
+            << static_cast<unsigned>(commit.rd)
 
             << " VALUE=0x"
             << std::hex
@@ -118,7 +116,6 @@ void printCommit(const CommitInfo& commit)
             << std::setfill('0')
             << commit.rdValue;
     }
-
 
     if (commit.memWrite) {
 
@@ -136,10 +133,9 @@ void printCommit(const CommitInfo& commit)
             << " MEM_SIZE="
             << std::dec
             << static_cast<unsigned>(
-                commit.memWriteSize
-            );
+                   commit.memWriteSize
+               );
     }
-
 
     std::cout
         << " NEXT_PC=0x"
@@ -152,6 +148,12 @@ void printCommit(const CommitInfo& commit)
         << std::setfill(' ')
         << '\n';
 }
+
+
+// ============================================================
+// RUN ONE TEST
+// ============================================================
+
 bool runTest(const TestCase& test)
 {
     std::cout
@@ -160,16 +162,14 @@ bool runTest(const TestCase& test)
         << test.name
         << "\n--------------------------------------------------\n";
 
-
     // --------------------------------------------------------
-    // Create fresh memory for every test.
+    // Fresh memory for every test
     // --------------------------------------------------------
 
     Memory memory;
 
-
     // --------------------------------------------------------
-    // Load program.
+    // Load program
     // --------------------------------------------------------
 
     if (!memory.loadHexFile(test.hexFile)) {
@@ -182,41 +182,47 @@ bool runTest(const TestCase& test)
         return false;
     }
 
-
     // --------------------------------------------------------
-    // Create fresh CPU.
+    // Fresh CPU
     // --------------------------------------------------------
 
     CPU cpu(memory);
 
     cpu.reset();
 
-
     // --------------------------------------------------------
-    // Execute program.
+    // Execute exact architectural instruction count
     // --------------------------------------------------------
 
-    const bool executionOK =
-        cpu.run(test.maxInstructions);
+    for (std::size_t i = 0;
+         i < test.instructionCount;
+         ++i) {
 
+        Commit commit{};
 
-    if (!executionOK) {
+        if (!cpu.step(commit)) {
 
-        std::cout
-            << "[FAIL] CPU execution failed\n";
+            std::cout
+                << "[FAIL] CPU execution failed at retired "
+                << "instruction "
+                << i
+                << '\n';
 
-        cpu.dumpRegisters();
+            cpu.dumpRegisters();
 
-        return false;
+            return false;
+        }
+
+        // Enable when commit debugging is required:
+        //
+        // printCommit(commit);
     }
 
-
     // --------------------------------------------------------
-    // Architectural x0 check.
+    // x0 architectural check
     // --------------------------------------------------------
 
     bool passed = true;
-
 
     if (cpu.getRegister(0) != 0) {
 
@@ -231,12 +237,12 @@ bool runTest(const TestCase& test)
             << "[PASS] x0 = 0\n";
     }
 
-
     // --------------------------------------------------------
-    // Expected register values.
+    // Expected architectural register state
     // --------------------------------------------------------
 
-    for (const auto& expectation : test.expectations) {
+    for (const auto& expectation :
+         test.expectations) {
 
         if (!checkRegister(
                 cpu,
@@ -248,7 +254,6 @@ bool runTest(const TestCase& test)
         }
     }
 
-
     // --------------------------------------------------------
     // Result
     // --------------------------------------------------------
@@ -259,7 +264,6 @@ bool runTest(const TestCase& test)
             << "[PASS] "
             << test.name
             << '\n';
-
     }
     else {
 
@@ -270,7 +274,6 @@ bool runTest(const TestCase& test)
 
         cpu.dumpRegisters();
     }
-
 
     return passed;
 }
@@ -291,16 +294,6 @@ int main()
     // ========================================================
     // DIRECTED TESTS
     // ========================================================
-    //
-    // IMPORTANT:
-    //
-    // These expected values must correspond to the actual HEX
-    // programs in tests/directed/.
-    //
-    // We'll start with values already confirmed by your RTL
-    // regression and expand them as required.
-    //
-    // ========================================================
 
     const std::vector<TestCase> tests = {
 
@@ -310,7 +303,6 @@ int main()
 
         {
             "alu",
-
             "tests/directed/alu.hex",
 
             {
@@ -318,31 +310,29 @@ int main()
                 {2, 20},
                 {3, 30},
                 {4, 20}
-            }
+            },
+
+            6
         },
 
 
         // ====================================================
         // 2. FORWARDING
-        //
-        // Architectural model does NOT model forwarding.
-        //
-        // It only checks the final committed state.
         // ====================================================
 
         {
             "forwarding",
-
             "tests/directed/forwarding.hex",
 
             {
-               
-        {1, 5},
-        {2, 10},
-        {3, 15},
-        {4, 25},
-        {5, 40}
-            }
+                {1, 5},
+                {2, 10},
+                {3, 15},
+                {4, 25},
+                {5, 40}
+            },
+
+            7
         },
 
 
@@ -352,35 +342,32 @@ int main()
 
         {
             "load_store",
-
             "tests/directed/load_store.hex",
 
             {
-                 {1, 42},
-        {2, 42}
-            }
+                {1, 42},
+                {2, 42}
+            },
+
+            5
         },
 
 
         // ====================================================
         // 4. LOAD-USE
-        //
-        // Again, the C++ architectural model doesn't stall.
-        //
-        // RTL must stall.
-        // Architectural result must still match.
         // ====================================================
 
         {
             "load_use",
-
             "tests/directed/load_use.hex",
 
             {
                 {1, 42},
                 {5, 42},
                 {6, 84}
-            }
+            },
+
+            6
         },
 
 
@@ -390,7 +377,6 @@ int main()
 
         {
             "beq_taken",
-
             "tests/directed/beq_taken.hex",
 
             {
@@ -399,7 +385,9 @@ int main()
                 {3, 0},
                 {4, 0},
                 {5, 42}
-            }
+            },
+
+            6
         },
 
 
@@ -409,39 +397,38 @@ int main()
 
         {
             "beq_not_taken",
-
             "tests/directed/beq_not_taken.hex",
 
             {
                 {1, 10},
                 {2, 20}
-            }
+            },
+
+            8
         },
 
 
         // ====================================================
         // 7. BRANCHES
-        //
-        // Values taken from the branch regression you already
-        // validated in RTL.
         // ====================================================
 
         {
             "branches",
-
             "tests/directed/branches.hex",
 
             {
-                {1,  10},
-                {2,  20},
-                {3,   3},
+                {1, 10},
+                {2, 20},
+                {3, 3},
                 {4, 0xFFFFFFFFu},
-                {5,   1},
-                {6,   6},
-                {7,   7},
-                {8,   8},
-                {9,   9}
-            }
+                {5, 1},
+                {6, 6},
+                {7, 7},
+                {8, 8},
+                {9, 9}
+            },
+
+            17
         },
 
 
@@ -451,15 +438,16 @@ int main()
 
         {
             "jal",
-
             "tests/directed/jal.hex",
 
             {
                 {1, 4},
-        {2, 0},
-        {3, 0},
-        {4, 42}
-            }
+                {2, 0},
+                {3, 0},
+                {4, 42}
+            },
+
+            4
         },
 
 
@@ -469,49 +457,56 @@ int main()
 
         {
             "jalr",
-
             "tests/directed/jalr.hex",
 
             {
                 {1, 20},
-        {2, 0},
-        {3, 0},
-        {4, 42},
-        {5, 12}
-            }
+                {2, 0},
+                {3, 0},
+                {4, 42},
+                {5, 12}
+            },
+
+            6
         },
+
+
+        // ====================================================
+        // 10. FULL REGRESSION
+        // ====================================================
+
         {
-    "full_regression",
-    "tests/directed/full_regression.hex",
-    {
-        {1,  10},
-        {2,  20},
-        {3,  30},
-        {4,  20},
-        {5,  20},
+            "full_regression",
+            "tests/directed/full_regression.hex",
 
-        {16, 16},
-        {17, 17},
+            {
+                {1,  10},
+                {2,  20},
+                {3,  30},
+                {4,  20},
+                {5,  20},
 
-        {18, 18},
-        {20, 124},
+                {16, 16},
+                {17, 17},
 
-        {19, 156},
-        {21, 148},
-        {22, 22}
-    },
+                {18, 18},
+                {20, 124},
 
-    500
-}
+                {19, 156},
+                {21, 148},
+                {22, 22}
+            },
+
+            32
+        }
     };
 
 
     // ========================================================
-    // RUN TESTS
+    // RUN REGRESSION
     // ========================================================
 
     std::size_t passedCount = 0;
-
 
     for (const auto& test : tests) {
 

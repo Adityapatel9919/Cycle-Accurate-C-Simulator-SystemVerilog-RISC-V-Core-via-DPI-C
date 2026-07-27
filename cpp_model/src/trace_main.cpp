@@ -1,93 +1,49 @@
-#include "cpu.h"
-#include "commit.h"
-#include "memory.h"
-
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
+#include "cpu.h"
+#include "memory.h"
+#include "commit.h"
+
 // ============================================================
-// PRINT ONE ARCHITECTURAL COMMIT
-// ============================================================
-//
-// Keep this format deterministic.
-//
-// Later the SystemVerilog RTL will emit the same fields so
-// an offline comparator can compare:
-//
-//      C++ commit N <-> RTL commit N
-//
+// Print one architectural commit in RTL-compatible format
 // ============================================================
 
-static void printCommit(
-    std::size_t commitNumber,
-    const CommitInfo& commit
-)
+static void printCommit(const Commit& commit)
 {
-    if (!commit.valid) {
-        return;
-    }
-
     std::cout
-        << "COMMIT "
-        << std::dec
-        << commitNumber
-
-        << " PC="
+        << "COMMIT PC="
         << std::hex
-        << std::setw(8)
         << std::setfill('0')
+        << std::setw(8)
         << commit.pc
 
         << " INSTR="
         << std::setw(8)
-        << commit.instruction
+        << commit.instruction;
 
-        << " REG_WRITE="
-        << std::dec
-        << (commit.regWrite ? 1 : 0)
+    if (commit.regWrite && commit.rd != 0) {
 
-        << " RD="
-        << static_cast<unsigned>(commit.rd)
+        std::cout
+            << " RD="
+            << std::dec
+            << static_cast<unsigned>(commit.rd)
 
-        << " RD_VALUE="
-        << std::hex
-        << std::setw(8)
-        << std::setfill('0')
-        << commit.rdValue
+            << " VALUE="
+            << std::hex
+            << std::setw(8)
+            << commit.rdValue;
+    }
+    else {
 
-        << " MEM_WRITE="
-        << std::dec
-        << (commit.memWrite ? 1 : 0)
+        std::cout
+            << " RD=- VALUE=-";
+    }
 
-        << " MEM_ADDR="
-        << std::hex
-        << std::setw(8)
-        << std::setfill('0')
-        << commit.memAddress
-
-        << " MEM_VALUE="
-        << std::setw(8)
-        << commit.memValue
-
-        << " MEM_SIZE="
-        << std::dec
-        << static_cast<unsigned>(
-            commit.memWriteSize
-        )
-
-        << " NEXT_PC="
-        << std::hex
-        << std::setw(8)
-        << std::setfill('0')
-        << commit.nextPC
-
-        << std::dec
-        << std::setfill(' ')
-        << '\n';
+    std::cout << '\n';
 }
 
 
@@ -97,74 +53,63 @@ static void printCommit(
 
 int main(int argc, char* argv[])
 {
-    // ========================================================
-    // COMMAND-LINE CHECK
-    // ========================================================
+    // --------------------------------------------------------
+    // Command-line arguments
+    //
+    // Usage:
+    //
+    // ./trace_model program.hex instruction_count
+    //
+    // Example:
+    //
+    // ./trace_model tests/directed/alu.hex 6
+    // --------------------------------------------------------
 
-    if (argc < 2 || argc > 3) {
+    if (argc != 3) {
 
         std::cerr
-            << "Usage:\n"
-            << "  "
+            << "Usage: "
             << argv[0]
-            << " <program.hex> [max_instructions]\n";
+            << " <program.hex> <instruction_count>\n";
+
+        return EXIT_FAILURE;
+    }
+
+    const std::string programFile = argv[1];
+
+    std::size_t instructionLimit = 0;
+
+    try {
+
+        instructionLimit =
+            static_cast<std::size_t>(
+                std::stoul(argv[2])
+            );
+
+    }
+    catch (...) {
+
+        std::cerr
+            << "ERROR: Invalid instruction count: "
+            << argv[2]
+            << '\n';
 
         return EXIT_FAILURE;
     }
 
 
-    const std::string programFile =
-        argv[1];
-
-
-    // Default safety limit.
-    std::size_t maxInstructions = 1000;
-
-
-    // ========================================================
-    // OPTIONAL INSTRUCTION LIMIT
-    // ========================================================
-
-    if (argc == 3) {
-
-        try {
-
-            const unsigned long long parsed =
-                std::stoull(argv[2]);
-
-            if (parsed == 0) {
-
-                std::cerr
-                    << "ERROR: max_instructions must be "
-                    << "greater than zero\n";
-
-                return EXIT_FAILURE;
-            }
-
-            maxInstructions =
-                static_cast<std::size_t>(parsed);
-
-        }
-        catch (const std::exception& e) {
-
-            std::cerr
-                << "ERROR: Invalid instruction limit: "
-                << argv[2]
-                << '\n';
-
-            return EXIT_FAILURE;
-        }
-    }
-
-
-    // ========================================================
-    // MEMORY
-    // ========================================================
+    // --------------------------------------------------------
+    // Create architectural memory
+    // --------------------------------------------------------
 
     Memory memory;
 
 
-    if (!memory.loadHexFile(programFile)) {
+    // --------------------------------------------------------
+    // Load HEX program
+    // --------------------------------------------------------
+
+    if (!memory.loadHexFile(programFile, 0)) {
 
         std::cerr
             << "ERROR: Failed to load program\n";
@@ -173,173 +118,37 @@ int main(int argc, char* argv[])
     }
 
 
-    // ========================================================
-    // CPU
-    // ========================================================
+    // --------------------------------------------------------
+    // Create CPU
+    // --------------------------------------------------------
 
     CPU cpu(memory);
 
-    cpu.reset(memory.getProgramStart());
 
+    // --------------------------------------------------------
+    // Execute and generate architectural trace
+    // --------------------------------------------------------
 
-    // ========================================================
-    // TRACE HEADER
-    // ========================================================
+    for (std::size_t i = 0;
+         i < instructionLimit;
+         ++i) {
 
-    std::cout
-        << "\n"
-        << "==================================================\n"
-        << "          RV32I C++ COMMIT TRACE\n"
-        << "==================================================\n"
-        << "Program : "
-        << programFile
-        << '\n'
-        << "Start   : 0x"
-        << std::hex
-        << std::setw(8)
-        << std::setfill('0')
-        << memory.getProgramStart()
-        << '\n'
-        << "End     : 0x"
-        << std::setw(8)
-        << memory.getProgramEnd()
-        << std::dec
-        << std::setfill(' ')
-        << '\n'
-        << "==================================================\n";
+        Commit commit{};
 
+        const bool success = cpu.step(commit);
 
-    // ========================================================
-    // EXECUTE INSTRUCTION-BY-INSTRUCTION
-    // ========================================================
-
-    std::size_t commitNumber = 0;
-
-    while (commitNumber < maxInstructions) {
-
-        // ----------------------------------------------------
-        // Normal completion
-        // ----------------------------------------------------
-
-        if (cpu.getPC() == memory.getProgramEnd()) {
-            break;
-        }
-
-
-        // ----------------------------------------------------
-        // Detect control flow outside loaded program
-        // ----------------------------------------------------
-
-        if (
-            cpu.getPC() < memory.getProgramStart() ||
-            cpu.getPC() > memory.getProgramEnd()
-        ) {
+        if (!success) {
 
             std::cerr
-                << "ERROR: PC outside loaded program: 0x"
-                << std::hex
-                << std::setw(8)
-                << std::setfill('0')
-                << cpu.getPC()
-                << std::dec
-                << std::setfill(' ')
+                << "ERROR: CPU execution failed at instruction "
+                << i
                 << '\n';
 
             return EXIT_FAILURE;
         }
 
-
-        // ----------------------------------------------------
-        // Execute exactly one instruction
-        // ----------------------------------------------------
-
-        if (!cpu.step()) {
-
-            std::cerr
-                << "ERROR: CPU execution failed at commit "
-                << commitNumber
-                << '\n';
-
-            return EXIT_FAILURE;
-        }
-
-
-        // ----------------------------------------------------
-        // Obtain architectural retirement information
-        // ----------------------------------------------------
-
-        const CommitInfo& commit =
-            cpu.getLastCommit();
-
-
-        if (!commit.valid) {
-
-            std::cerr
-                << "ERROR: CPU step completed without "
-                << "a valid commit record\n";
-
-            return EXIT_FAILURE;
-        }
-
-
-        // ----------------------------------------------------
-        // Print commit
-        // ----------------------------------------------------
-
-        printCommit(
-            commitNumber,
-            commit
-        );
-
-
-        ++commitNumber;
+        printCommit(commit);
     }
-
-
-    // ========================================================
-    // INSTRUCTION LIMIT CHECK
-    // ========================================================
-
-    if (
-        commitNumber == maxInstructions &&
-        cpu.getPC() != memory.getProgramEnd()
-    ) {
-
-        std::cerr
-            << "\nERROR: Maximum instruction limit reached\n"
-            << "Possible infinite loop or incorrect control flow.\n"
-            << "PC = 0x"
-            << std::hex
-            << std::setw(8)
-            << std::setfill('0')
-            << cpu.getPC()
-            << std::dec
-            << std::setfill(' ')
-            << '\n';
-
-        return EXIT_FAILURE;
-    }
-
-
-    // ========================================================
-    // SUMMARY
-    // ========================================================
-
-    std::cout
-        << "==================================================\n"
-        << "TRACE COMPLETE\n"
-        << "Commits  : "
-        << commitNumber
-        << '\n'
-        << "Final PC : 0x"
-        << std::hex
-        << std::setw(8)
-        << std::setfill('0')
-        << cpu.getPC()
-        << std::dec
-        << std::setfill(' ')
-        << '\n'
-        << "==================================================\n";
 
 
     return EXIT_SUCCESS;

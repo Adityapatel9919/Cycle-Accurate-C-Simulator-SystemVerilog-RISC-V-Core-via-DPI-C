@@ -15,16 +15,31 @@ module top_tb;
     integer redirect_count;
 
     integer test_id;
+    logic        commit_valid;
+    logic [31:0] commit_pc;
+    logic [31:0] commit_instr;
+
+    logic        commit_reg_write;
+    logic [4:0]  commit_rd;
+    logic [31:0] commit_rd_value;
 
 
     // ============================================================
     // DUT
     // ============================================================
 
-    top dut (
-        .clk (clk),
-        .rst (rst)
-    );
+  top dut (
+    .clk              (clk),
+    .rst              (rst),
+
+    .commit_valid      (commit_valid),
+    .commit_pc         (commit_pc),
+    .commit_instr      (commit_instr),
+
+    .commit_reg_write  (commit_reg_write),
+    .commit_rd         (commit_rd),
+    .commit_rd_value   (commit_rd_value)
+);
 
 pipeline_assertions assertions_inst (
 
@@ -848,5 +863,34 @@ pipeline_assertions assertions_inst (
         $finish;
 
     end
+    always @(posedge clk) begin
+
+    if (!rst && commit_valid) begin
+
+        if (commit_reg_write) begin
+
+            $display(
+                "COMMIT PC=%08x INSTR=%08x RD=%0d VALUE=%08x",
+                commit_pc,
+                commit_instr,
+                commit_rd,
+                commit_rd_value
+            );
+
+        end
+        else begin
+
+            $display(
+                "COMMIT PC=%08x INSTR=%08x RD=- VALUE=-",
+                commit_pc,
+                commit_instr
+            );
+
+        end
+
+    end
+
+end
+
 
 endmodule
