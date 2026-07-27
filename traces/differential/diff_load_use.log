@@ -1,0 +1,18 @@
+==================================================
+       RV32I DIFFERENTIAL VERIFICATION
+==================================================
+
+RTL trace      : traces/differential/rtl_load_use.log
+C++ trace      : traces/differential/cpp_load_use.log
+RTL commits    : 95
+C++ commits    : 6
+Compare count  : 6
+
+==================================================
+       DIFFERENTIAL VERIFICATION PASSED
+==================================================
+
+Commits compared : 6
+Mismatches       : 0
+
+==================================================

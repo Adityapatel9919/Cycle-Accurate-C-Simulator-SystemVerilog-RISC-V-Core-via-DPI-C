@@ -1,0 +1,18 @@
+==================================================
+       RV32I DIFFERENTIAL VERIFICATION
+==================================================
+
+RTL trace      : traces/differential/rtl_branches.log
+C++ trace      : traces/differential/cpp_branches.log
+RTL commits    : 90
+C++ commits    : 17
+Compare count  : 17
+
+==================================================
+       DIFFERENTIAL VERIFICATION PASSED
+==================================================
+
+Commits compared : 17
+Mismatches       : 0
+
+==================================================

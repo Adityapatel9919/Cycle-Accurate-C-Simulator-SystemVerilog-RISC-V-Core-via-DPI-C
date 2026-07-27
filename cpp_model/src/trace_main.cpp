@@ -1,12 +1,11 @@
-#include <cstdint>
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
+#include "commit.h"
 #include "cpu.h"
 #include "memory.h"
-#include "commit.h"
 
 // ============================================================
 // Print one architectural commit in RTL-compatible format
@@ -58,44 +57,28 @@ int main(int argc, char* argv[])
     //
     // Usage:
     //
-    // ./trace_model program.hex instruction_count
+    //     ./trace_model program.hex
     //
     // Example:
     //
-    // ./trace_model tests/directed/alu.hex 6
+    //     ./trace_model tests/directed/alu.hex
+    //
+    // Execution now terminates automatically when the current
+    // PC leaves the address range occupied by the loaded
+    // program.
     // --------------------------------------------------------
 
-    if (argc != 3) {
+    if (argc != 2) {
 
         std::cerr
             << "Usage: "
             << argv[0]
-            << " <program.hex> <instruction_count>\n";
+            << " <program.hex>\n";
 
         return EXIT_FAILURE;
     }
 
     const std::string programFile = argv[1];
-
-    std::size_t instructionLimit = 0;
-
-    try {
-
-        instructionLimit =
-            static_cast<std::size_t>(
-                std::stoul(argv[2])
-            );
-
-    }
-    catch (...) {
-
-        std::cerr
-            << "ERROR: Invalid instruction count: "
-            << argv[2]
-            << '\n';
-
-        return EXIT_FAILURE;
-    }
 
 
     // --------------------------------------------------------
@@ -119,6 +102,19 @@ int main(int argc, char* argv[])
 
 
     // --------------------------------------------------------
+    // Reject empty programs
+    // --------------------------------------------------------
+
+    if (memory.getProgramWordCount() == 0) {
+
+        std::cerr
+            << "ERROR: Program contains no instructions\n";
+
+        return EXIT_FAILURE;
+    }
+
+
+    // --------------------------------------------------------
     // Create CPU
     // --------------------------------------------------------
 
@@ -127,27 +123,30 @@ int main(int argc, char* argv[])
 
     // --------------------------------------------------------
     // Execute and generate architectural trace
+    //
+    // Continue until control flow leaves the loaded program.
     // --------------------------------------------------------
 
-    for (std::size_t i = 0;
-         i < instructionLimit;
-         ++i) {
+    while (cpu.isPCInProgram()) {
 
         Commit commit{};
 
-        const bool success = cpu.step(commit);
-
-        if (!success) {
+        if (!cpu.step(commit)) {
 
             std::cerr
-                << "ERROR: CPU execution failed at instruction "
-                << i
+                << "ERROR: CPU execution failed at PC 0x"
+                << std::hex
+                << std::setw(8)
+                << std::setfill('0')
+                << cpu.getPC()
                 << '\n';
 
             return EXIT_FAILURE;
         }
 
-        printCommit(commit);
+        if (commit.valid) {
+            printCommit(commit);
+        }
     }
 
 

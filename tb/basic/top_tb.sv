@@ -863,34 +863,5 @@ pipeline_assertions assertions_inst (
         $finish;
 
     end
-    always @(posedge clk) begin
-
-    if (!rst && commit_valid) begin
-
-        if (commit_reg_write) begin
-
-            $display(
-                "COMMIT PC=%08x INSTR=%08x RD=%0d VALUE=%08x",
-                commit_pc,
-                commit_instr,
-                commit_rd,
-                commit_rd_value
-            );
-
-        end
-        else begin
-
-            $display(
-                "COMMIT PC=%08x INSTR=%08x RD=- VALUE=-",
-                commit_pc,
-                commit_instr
-            );
-
-        end
-
-    end
-
-end
-
 
 endmodule

@@ -834,3 +834,7 @@ void CPU::dumpRegisters() const
 
         << "========================================\n";
 }
+bool CPU::isPCInProgram() const
+{
+    return memory_.isProgramAddress(pc_);
+}

@@ -1,0 +1,18 @@
+==================================================
+       RV32I DIFFERENTIAL VERIFICATION
+==================================================
+
+RTL trace      : traces/differential/rtl_beq_not_taken.log
+C++ trace      : traces/differential/cpp_beq_not_taken.log
+RTL commits    : 96
+C++ commits    : 8
+Compare count  : 8
+
+==================================================
+       DIFFERENTIAL VERIFICATION PASSED
+==================================================
+
+Commits compared : 8
+Mismatches       : 0
+
+==================================================

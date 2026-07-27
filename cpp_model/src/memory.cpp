@@ -329,3 +329,13 @@ std::size_t Memory::getProgramWordCount() const
 {
     return programWordCount;
 }
+// ============================================================
+// Check whether address belongs to loaded program
+// ============================================================
+
+bool Memory::isProgramAddress(uint32_t address) const
+{
+    return programWordCount != 0 &&
+           address >= programStart &&
+           address < programEnd;
+}

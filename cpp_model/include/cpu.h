@@ -10,43 +10,75 @@
 #include "instruction.h"
 #include "memory.h"
 
+// ============================================================
+// RV32I CPU REFERENCE MODEL
+// ============================================================
+
 class CPU
 {
 public:
+
     explicit CPU(Memory& memory);
 
-    // Reset architectural CPU state
+
+    // ========================================================
+    // RESET
+    // ========================================================
+
     void reset();
+
 
     // ========================================================
     // EXECUTION
     // ========================================================
 
-    // Execute one instruction without requesting commit info.
-    // Keeps existing code/test_runner.cpp compatible.
+    // Execute one instruction.
     bool step();
 
     // Execute one instruction and return architectural
-    // commit information for differential verification.
+    // commit information.
     bool step(Commit& commit);
 
-    // Execute multiple instructions.
+    // Execute a fixed number of instructions.
+    //
+    // Kept for compatibility with existing directed tests.
     bool run(std::size_t instructionLimit);
+
+
+    // ========================================================
+    // PROGRAM EXECUTION STATE
+    // ========================================================
+
+    // Returns true when the current PC points to an
+    // instruction inside the loaded program.
+    //
+    // This allows trace/differential execution to terminate
+    // naturally when control flow leaves the program.
+    bool isPCInProgram() const;
+
 
     // ========================================================
     // ARCHITECTURAL STATE ACCESS
     // ========================================================
 
-    uint32_t getRegister(uint32_t index) const;
+    uint32_t getRegister(
+        uint32_t index
+    ) const;
 
     uint32_t getPC() const;
 
     uint64_t getInstructionCount() const;
 
-    // Debug helper
+
+    // ========================================================
+    // DEBUG
+    // ========================================================
+
     void dumpRegisters() const;
 
+
 private:
+
     // ========================================================
     // ARCHITECTURAL STATE
     // ========================================================
@@ -59,25 +91,25 @@ private:
 
     uint64_t instructionCount_ = 0;
 
+
     // ========================================================
     // INTERNAL HELPERS
     // ========================================================
 
     // Architectural register write.
-    // x0 is always hardwired to zero.
+    // x0 is permanently hardwired to zero.
     void writeRegister(
         uint32_t rd,
         uint32_t value
     );
 
-    // Execute decoded instruction.
-    //
-    // commit is filled with the architectural effects of the
-    // instruction being executed.
+
+    // Execute one decoded instruction and record its
+    // architectural effects.
     bool executeInstruction(
         const DecodedInstruction& decoded,
         Commit& commit
     );
 };
 
-#endif
+#endif // CPU_H

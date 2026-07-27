@@ -835,5 +835,53 @@ always_comb begin
     commit_rd_value  = writeback_data;
 
 end
+// ============================================================
+// ARCHITECTURAL COMMIT TRACE
+// ============================================================
+//
+// An instruction becomes architecturally visible when it
+// reaches the MEM/WB stage.
+//
+// This trace is consumed by the C++ differential checker.
+//
+// ============================================================
+
+always_ff @(posedge clk) begin
+
+    if (!rst && mem_wb_valid) begin
+
+        // ----------------------------------------------------
+        // Register-writing instruction
+        // ----------------------------------------------------
+
+        if (mem_wb_reg_write && (mem_wb_rd != 5'd0)) begin
+
+            $display(
+                "COMMIT PC=0x%08h INSTR=0x%08h RD=x%0d VALUE=0x%08h",
+                mem_wb_pc,
+                mem_wb_instr,
+                mem_wb_rd,
+                writeback_data
+            );
+
+        end
+
+        // ----------------------------------------------------
+        // Instruction with no architectural register write
+        // ----------------------------------------------------
+
+        else begin
+
+            $display(
+                "COMMIT PC=0x%08h INSTR=0x%08h RD=- VALUE=-",
+                mem_wb_pc,
+                mem_wb_instr
+            );
+
+        end
+
+    end
+
+end
 
 endmodule
