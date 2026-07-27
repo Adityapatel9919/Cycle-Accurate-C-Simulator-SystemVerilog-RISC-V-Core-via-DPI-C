@@ -36,5 +36,5 @@ Commits : 4
 
 - tb/dpi/dpi_tb.sv:303: Verilog $finish
 - S i m u l a t i o n   R e p o r t: Verilator 5.048 2026-04-26
-- Verilator: $finish at 135ns; walltime 0.001 s; speed 219.512 us/s
+- Verilator: $finish at 135ns; walltime 0.001 s; speed 225.000 us/s
 - Verilator: cpu 0.001 s on 1 threads; allocated 3 MB

@@ -3,9 +3,9 @@
 
 #include <cstdint>
 
-// ============================================================
+
 // RV32I OPCODES
-// ============================================================
+
 
 enum class Opcode : uint8_t {
 
@@ -23,9 +23,9 @@ enum class Opcode : uint8_t {
 };
 
 
-// ============================================================
+
 // INSTRUCTION FORMAT
-// ============================================================
+
 
 enum class InstructionFormat {
 
@@ -40,7 +40,7 @@ enum class InstructionFormat {
 };
 
 
-// ============================================================
+
 // RV32I OPERATIONS
 //
 // This represents the actual decoded instruction.
@@ -54,7 +54,7 @@ enum class InstructionFormat {
 // funct7 = 0000000
 //
 // operation = ADD
-// ============================================================
+
 
 enum class Operation {
 
@@ -155,9 +155,9 @@ enum class Operation {
 };
 
 
-// ============================================================
+
 // DECODED INSTRUCTION
-// ============================================================
+
 //
 // Decoder converts:
 //
@@ -177,7 +177,7 @@ enum class Operation {
 // rs1       = 1
 // rs2       = 2
 //
-// ============================================================
+
 
 struct DecodedInstruction {
 
@@ -233,9 +233,9 @@ struct DecodedInstruction {
 };
 
 
-// ============================================================
+
 // OPCODE EXTRACTION
-// ============================================================
+
 
 inline uint8_t extractOpcode(uint32_t instruction)
 {
@@ -245,11 +245,11 @@ inline uint8_t extractOpcode(uint32_t instruction)
 }
 
 
-// ============================================================
+
 // RD EXTRACTION
 //
 // instruction[11:7]
-// ============================================================
+
 
 inline uint8_t extractRd(uint32_t instruction)
 {
@@ -259,11 +259,11 @@ inline uint8_t extractRd(uint32_t instruction)
 }
 
 
-// ============================================================
+
 // FUNCT3 EXTRACTION
 //
 // instruction[14:12]
-// ============================================================
+
 
 inline uint8_t extractFunct3(uint32_t instruction)
 {
@@ -273,11 +273,11 @@ inline uint8_t extractFunct3(uint32_t instruction)
 }
 
 
-// ============================================================
+
 // RS1 EXTRACTION
 //
 // instruction[19:15]
-// ============================================================
+
 
 inline uint8_t extractRs1(uint32_t instruction)
 {
@@ -287,11 +287,11 @@ inline uint8_t extractRs1(uint32_t instruction)
 }
 
 
-// ============================================================
+
 // RS2 EXTRACTION
-//
+
 // instruction[24:20]
-// ============================================================
+
 
 inline uint8_t extractRs2(uint32_t instruction)
 {
@@ -427,11 +427,11 @@ inline int32_t extractImmediateB(
 }
 
 
-// ============================================================
+
 // U-TYPE IMMEDIATE
 //
 // imm[31:12] = instruction[31:12]
-// ============================================================
+
 
 inline int32_t extractImmediateU(
     uint32_t instruction
@@ -443,7 +443,7 @@ inline int32_t extractImmediateU(
 }
 
 
-// ============================================================
+
 // J-TYPE IMMEDIATE
 //
 // imm[20]    = instruction[31]
@@ -451,7 +451,7 @@ inline int32_t extractImmediateU(
 // imm[11]    = instruction[20]
 // imm[19:12] = instruction[19:12]
 // imm[0]     = 0
-// ============================================================
+
 
 inline int32_t extractImmediateJ(
     uint32_t instruction

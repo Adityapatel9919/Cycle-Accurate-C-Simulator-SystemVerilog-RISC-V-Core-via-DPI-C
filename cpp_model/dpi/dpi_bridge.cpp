@@ -9,9 +9,6 @@
 #include "cpu.h"
 #include "memory.h"
 
-// ============================================================
-// DPI LOCKSTEP STATE
-// ============================================================
 
 static std::unique_ptr<Memory> g_memory;
 static std::unique_ptr<CPU>    g_cpu;
@@ -20,9 +17,7 @@ static uint64_t g_commitCount = 0;
 static uint64_t g_mismatches  = 0;
 
 
-// ============================================================
-// INITIALISE GOLDEN MODEL
-// ============================================================
+
 
 extern "C" int dpi_init(const char* programFile)
 {
@@ -58,9 +53,7 @@ extern "C" int dpi_init(const char* programFile)
 }
 
 
-// ============================================================
-// COMPARE ONE RTL RETIREMENT AGAINST C++
-// ============================================================
+
 
 extern "C" int dpi_check_commit(
     uint32_t rtlPC,
@@ -103,27 +96,19 @@ extern "C" int dpi_check_commit(
 
     bool match = true;
 
-    // --------------------------------------------------------
-    // PC
-    // --------------------------------------------------------
+    
 
     if (rtlPC != reference.pc) {
         match = false;
     }
 
-    // --------------------------------------------------------
-    // Instruction
-    // --------------------------------------------------------
+    
 
     if (rtlInstruction != reference.instruction) {
         match = false;
     }
 
-    // --------------------------------------------------------
-    // Register-write enable
-    //
-    // Writes to x0 are architecturally ignored.
-    // --------------------------------------------------------
+   
 
     const bool rtlWritesRegister =
         (rtlRegWrite != 0) && (rtlRD != 0);
@@ -135,9 +120,7 @@ extern "C" int dpi_check_commit(
         match = false;
     }
 
-    // --------------------------------------------------------
-    // Register destination/value
-    // --------------------------------------------------------
+    
 
     if (rtlWritesRegister && cppWritesRegister) {
 
@@ -150,10 +133,6 @@ extern "C" int dpi_check_commit(
         }
     }
 
-
-    // ========================================================
-    // MISMATCH REPORT
-    // ========================================================
 
     if (!match) {
 
@@ -242,9 +221,7 @@ extern "C" int dpi_check_commit(
     }
 
 
-    // ========================================================
-    // MATCH
-    // ========================================================
+  
 
     std::cout
         << "[DPI PASS] Commit "
@@ -260,20 +237,7 @@ extern "C" int dpi_check_commit(
 
     return 1;
 }
-// ============================================================
-// CHECK WHETHER GOLDEN MODEL HAS FINISHED PROGRAM
-// ============================================================
-//
-// Returns:
-//
-//     1 -> C++ PC has left the loaded program
-//     0 -> C++ still has instructions to execute
-//
-// The SystemVerilog DPI testbench uses this after each
-// successful commit comparison to determine when architectural
-// execution is complete.
-//
-// ============================================================
+
 
 extern "C" int dpi_reference_finished()
 {
@@ -288,9 +252,7 @@ extern "C" int dpi_reference_finished()
     return g_cpu->isPCInProgram() ? 0 : 1;
 }
 
-// ============================================================
-// FINAL CHECK
-// ============================================================
+
 
 extern "C" int dpi_finish()
 {

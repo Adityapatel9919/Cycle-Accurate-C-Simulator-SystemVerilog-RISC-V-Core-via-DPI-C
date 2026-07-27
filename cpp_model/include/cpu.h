@@ -21,16 +21,16 @@ public:
     explicit CPU(Memory& memory);
 
 
-    // ========================================================
+  
     // RESET
-    // ========================================================
+  
 
     void reset();
 
 
-    // ========================================================
+  
     // EXECUTION
-    // ========================================================
+  
 
     // Execute one instruction.
     bool step();
@@ -45,21 +45,21 @@ public:
     bool run(std::size_t instructionLimit);
 
 
-    // ========================================================
+  
     // PROGRAM EXECUTION STATE
-    // ========================================================
+  
 
     // Returns true when the current PC points to an
     // instruction inside the loaded program.
-    //
+    
     // This allows trace/differential execution to terminate
     // naturally when control flow leaves the program.
     bool isPCInProgram() const;
 
 
-    // ========================================================
+  
     // ARCHITECTURAL STATE ACCESS
-    // ========================================================
+  
 
     uint32_t getRegister(
         uint32_t index
@@ -70,18 +70,18 @@ public:
     uint64_t getInstructionCount() const;
 
 
-    // ========================================================
+  
     // DEBUG
-    // ========================================================
+  
 
     void dumpRegisters() const;
 
 
 private:
 
-    // ========================================================
+  
     // ARCHITECTURAL STATE
-    // ========================================================
+  
 
     Memory& memory_;
 
@@ -92,9 +92,9 @@ private:
     uint64_t instructionCount_ = 0;
 
 
-    // ========================================================
+  
     // INTERNAL HELPERS
-    // ========================================================
+  
 
     // Architectural register write.
     // x0 is permanently hardwired to zero.
