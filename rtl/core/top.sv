@@ -1,6 +1,7 @@
 module top (
     input logic clk,
     input logic rst
+   
 );
 
     // ============================================================
@@ -39,7 +40,10 @@ module top (
     logic [31:0] if_id_pc;
     logic [31:0] if_id_instruction;
 
-
+    logic if_id_valid;
+logic id_ex_valid;
+logic ex_mem_valid;
+logic mem_wb_valid;
     // ============================================================
     // ID STAGE
     // ============================================================
@@ -113,7 +117,7 @@ module top (
 
     logic [31:0] id_ex_pc;
     logic [31:0] id_ex_pc_plus4;
-
+    logic [31:0] id_ex_instr;
     logic [31:0] id_ex_rs1_data;
     logic [31:0] id_ex_rs2_data;
     logic [31:0] id_ex_immediate;
@@ -172,7 +176,8 @@ module top (
     logic [31:0] ex_mem_alu_result;
     logic [31:0] ex_mem_rs2_data;
     logic [31:0] ex_mem_pc_plus4;
-
+    logic [31:0] ex_mem_pc;
+    logic [31:0] ex_mem_instr;
     logic [4:0] ex_mem_rd;
 
     logic ex_mem_mem_read;
@@ -196,7 +201,8 @@ module top (
     logic [31:0] mem_wb_memory_data;
     logic [31:0] mem_wb_alu_result;
     logic [31:0] mem_wb_pc_plus4;
-
+    logic [31:0] mem_wb_pc;
+    logic [31:0] mem_wb_instr;
     logic [4:0] mem_wb_rd;
 
     logic       mem_wb_reg_write;
@@ -465,20 +471,21 @@ module top (
     // IF/ID
     // ============================================================
 
-    if_id if_id_inst (
-        .clk            (clk),
-        .rst            (rst),
+if_id if_id_inst (
+    .clk             (clk),
+    .rst             (rst),
 
-        .write_enable   (if_id_write),
-        .flush          (if_id_flush),
+    .write_enable    (if_id_write),
+    .flush           (if_id_flush),
 
-        .pc_in          (pc_current),
-        .instruction_in (instruction_if),
+    .valid_in        (1'b1),
+    .pc_in           (pc_current),
+    .instruction_in  (instruction_if),
 
-        .pc_out         (if_id_pc),
-        .instruction_out(if_id_instruction)
-    );
-
+    .valid_out       (if_id_valid),
+    .pc_out          (if_id_pc),
+    .instruction_out (if_id_instruction)
+);
 
     // ============================================================
     // CONTROL UNIT
@@ -560,70 +567,85 @@ module top (
     // ID/EX
     // ============================================================
 
-    id_ex id_ex_inst (
-        .clk             (clk),
-        .rst             (rst),
-        .flush           (id_ex_flush),
+id_ex id_ex_inst (
+    .clk            (clk),
+    .rst            (rst),
+    .flush          (id_ex_flush),
 
-        .pc_in           (if_id_pc),
-        .pc_plus4_in     (pc_plus4_id),
+    // Trace
+    .valid_in       (if_id_valid),
 
-        .rs1_data_in     (rs1_data_id),
-        .rs2_data_in     (rs2_data_id),
+    // Data
+    .pc_in          (if_id_pc),
+    .instr_in       (if_id_instruction),
+    .pc_plus4_in    (pc_plus4_id),
 
-        .immediate_in    (immediate_id),
+    .rs1_data_in    (rs1_data_id),
+    .rs2_data_in    (rs2_data_id),
+    .immediate_in   (immediate_id),
 
-        .rs1_in          (rs1_id),
-        .rs2_in          (rs2_id),
-        .rd_in           (rd_id),
+    .rs1_in         (rs1_id),
+    .rs2_in         (rs2_id),
+    .rd_in          (rd_id),
 
-        .funct3_in       (funct3_id),
-        .funct7_in       (funct7_id),
+    .funct3_in      (funct3_id),
+    .funct7_in      (funct7_id),
 
-        .alu_src_in      (alu_src_id),
-        .alu_op_in       (alu_op_id),
-        .alu_a_sel_in    (alu_a_sel_id),
+    // EX control
+    .alu_src_in     (alu_src_id),
+    .alu_op_in      (alu_op_id),
+    .alu_a_sel_in   (alu_a_sel_id),
 
-        .mem_read_in     (mem_read_id),
-        .mem_write_in    (mem_write_id),
-        .branch_in       (branch_id),
+    // MEM control
+    .mem_read_in    (mem_read_id),
+    .mem_write_in   (mem_write_id),
+    .branch_in      (branch_id),
 
-        .jump_in         (jump_id),
-        .jalr_in         (jalr_id),
+    // Control flow
+    .jump_in        (jump_id),
+    .jalr_in        (jalr_id),
 
-        .reg_write_in    (reg_write_id),
-        .wb_sel_in       (wb_sel_id),
+    // WB control
+    .reg_write_in   (reg_write_id),
+    .wb_sel_in      (wb_sel_id),
 
-        .pc_out          (id_ex_pc),
-        .pc_plus4_out    (id_ex_pc_plus4),
+    // Trace
+    .valid_out      (id_ex_valid),
 
-        .rs1_data_out    (id_ex_rs1_data),
-        .rs2_data_out    (id_ex_rs2_data),
+    // Data outputs
+    .pc_out         (id_ex_pc),
+    .instr_out      (id_ex_instr),
+    .pc_plus4_out   (id_ex_pc_plus4),
 
-        .immediate_out   (id_ex_immediate),
+    .rs1_data_out   (id_ex_rs1_data),
+    .rs2_data_out   (id_ex_rs2_data),
+    .immediate_out  (id_ex_immediate),
 
-        .rs1_out         (id_ex_rs1),
-        .rs2_out         (id_ex_rs2),
-        .rd_out          (id_ex_rd),
+    .rs1_out        (id_ex_rs1),
+    .rs2_out        (id_ex_rs2),
+    .rd_out         (id_ex_rd),
 
-        .funct3_out      (id_ex_funct3),
-        .funct7_out      (id_ex_funct7),
+    .funct3_out     (id_ex_funct3),
+    .funct7_out     (id_ex_funct7),
 
-        .alu_src_out     (id_ex_alu_src),
-        .alu_op_out      (id_ex_alu_op),
-        .alu_a_sel_out   (id_ex_alu_a_sel),
+    // EX control outputs
+    .alu_src_out    (id_ex_alu_src),
+    .alu_op_out     (id_ex_alu_op),
+    .alu_a_sel_out  (id_ex_alu_a_sel),
 
-        .mem_read_out    (id_ex_mem_read),
-        .mem_write_out   (id_ex_mem_write),
-        .branch_out      (id_ex_branch),
+    // MEM control outputs
+    .mem_read_out   (id_ex_mem_read),
+    .mem_write_out  (id_ex_mem_write),
+    .branch_out     (id_ex_branch),
 
-        .jump_out        (id_ex_jump),
-        .jalr_out        (id_ex_jalr),
+    // Control flow outputs
+    .jump_out       (id_ex_jump),
+    .jalr_out       (id_ex_jalr),
 
-        .reg_write_out   (id_ex_reg_write),
-        .wb_sel_out      (id_ex_wb_sel)
-    );
-
+    // WB outputs
+    .reg_write_out  (id_ex_reg_write),
+    .wb_sel_out     (id_ex_wb_sel)
+);
 
     // ============================================================
     // FORWARDING UNIT
@@ -748,28 +770,39 @@ module top (
     // MEM/WB
     // ============================================================
 
-    mem_wb mem_wb_inst (
-        .clk             (clk),
-        .rst             (rst),
-        .flush           (1'b0),
+  mem_wb mem_wb_inst (
+    .clk            (clk),
+    .rst            (rst),
 
-        .memory_data_in  (memory_read_data),
-        .alu_result_in   (ex_mem_alu_result),
-        .pc_plus4_in     (ex_mem_pc_plus4),
+    .valid_in       (ex_mem_valid),
+    .pc_in          (ex_mem_pc),
+    .instr_in       (ex_mem_instr),
 
-        .rd_in           (ex_mem_rd),
+    .alu_result_in  (ex_mem_alu_result),
 
-        .reg_write_in    (ex_mem_reg_write),
-        .wb_sel_in       (ex_mem_wb_sel),
+    // FIXED
+    .mem_data_in    (memory_read_data),
 
-        .memory_data_out (mem_wb_memory_data),
-        .alu_result_out  (mem_wb_alu_result),
-        .pc_plus4_out    (mem_wb_pc_plus4),
+    .pc_plus4_in    (ex_mem_pc_plus4),
+    .rd_in          (ex_mem_rd),
 
-        .rd_out           (mem_wb_rd),
+    .reg_write_in   (ex_mem_reg_write),
+    .wb_sel_in      (ex_mem_wb_sel),
 
-        .reg_write_out    (mem_wb_reg_write),
-        .wb_sel_out       (mem_wb_wb_sel)
-    );
+    .valid_out      (mem_wb_valid),
+    .pc_out         (mem_wb_pc),
+    .instr_out      (mem_wb_instr),
+
+    .alu_result_out (mem_wb_alu_result),
+
+    // FIXED
+    .mem_data_out   (mem_wb_memory_data),
+
+    .pc_plus4_out   (mem_wb_pc_plus4),
+    .rd_out         (mem_wb_rd),
+
+    .reg_write_out  (mem_wb_reg_write),
+    .wb_sel_out     (mem_wb_wb_sel)
+);
 
 endmodule

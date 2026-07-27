@@ -8,6 +8,10 @@ module id_ex (
     // ============================================================
 
     input logic [31:0] pc_in,
+    input  logic        valid_in,
+
+    
+    input logic [31:0] instr_in,
     input logic [31:0] pc_plus4_in,
 
     input logic [31:0] rs1_data_in,
@@ -56,6 +60,8 @@ module id_ex (
     // ============================================================
 
     output logic [31:0] pc_out,
+    output logic [31:0] instr_out,
+    output logic        valid_out,
     output logic [31:0] pc_plus4_out,
 
     output logic [31:0] rs1_data_out,
@@ -109,9 +115,11 @@ module id_ex (
 
         if (rst || flush) begin
 
-            pc_out          <= 32'b0;
-            pc_plus4_out    <= 32'b0;
-
+            
+            pc_out       <= 32'b0;
+            instr_out    <= 32'h00000013; // NOP
+            pc_plus4_out <= 32'b0;
+            valid_out <= 1'b0;
             rs1_data_out    <= 32'b0;
             rs2_data_out    <= 32'b0;
             immediate_out   <= 32'b0;
@@ -149,7 +157,10 @@ module id_ex (
 
         else begin
 
+            valid_out       <= valid_in;
+
             pc_out          <= pc_in;
+            instr_out       <= instr_in;
             pc_plus4_out    <= pc_plus4_in;
 
             rs1_data_out    <= rs1_data_in;

@@ -3,6 +3,9 @@ module ex_mem (
     input logic rst,
     input logic flush,
 
+    input logic [31:0] pc_in,
+    input logic [31:0] instr_in,
+
     input logic [31:0] alu_result_in,
     input logic [31:0] rs2_data_in,
     input logic [31:0] pc_plus4_in,
@@ -18,7 +21,8 @@ module ex_mem (
     output logic [31:0] rs2_data_out,
     output logic [31:0] pc_plus4_out,
     output logic [4:0]  rd_out,
-
+    output logic [31:0] pc_out,
+    output logic [31:0] instr_out,
     output logic mem_read_out,
     output logic mem_write_out,
 
@@ -32,7 +36,8 @@ module ex_mem (
             rs2_data_out   <= 32'b0;
             pc_plus4_out   <= 32'b0;
             rd_out         <= 5'b0;
-
+            pc_out    <= 32'b0;
+            instr_out <= 32'h00000013;
             mem_read_out   <= 1'b0;
             mem_write_out  <= 1'b0;
 
@@ -40,6 +45,8 @@ module ex_mem (
             wb_sel_out     <= 2'b00;
         end
         else begin
+            pc_out    <= pc_in;
+            instr_out <= instr_in;
             alu_result_out <= alu_result_in;
             rs2_data_out   <= rs2_data_in;
             pc_plus4_out   <= pc_plus4_in;

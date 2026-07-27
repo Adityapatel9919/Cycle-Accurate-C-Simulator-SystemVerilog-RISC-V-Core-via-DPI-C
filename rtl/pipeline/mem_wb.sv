@@ -1,34 +1,51 @@
 module mem_wb (
     input logic clk,
     input logic rst,
-    input logic flush,
 
-    // ============================================================
+    // ========================================================
+    // COMMIT / TRACE TRACKING
+    // ========================================================
+
+    input logic        valid_in,
+    input logic [31:0] pc_in,
+    input logic [31:0] instr_in,
+
+    // ========================================================
     // DATA FROM MEM STAGE
-    // ============================================================
+    // ========================================================
 
-    input logic [31:0] memory_data_in,
     input logic [31:0] alu_result_in,
+    input logic [31:0] mem_data_in,
     input logic [31:0] pc_plus4_in,
+    input logic [4:0]  rd_in,
 
-    input logic [4:0] rd_in,
-
-    // ============================================================
-    // WB CONTROL SIGNALS
-    // ============================================================
+    // ========================================================
+    // WB CONTROL
+    // ========================================================
 
     input logic       reg_write_in,
     input logic [1:0] wb_sel_in,
 
-    // ============================================================
-    // OUTPUTS TO WB STAGE
-    // ============================================================
+    // ========================================================
+    // COMMIT / TRACE OUTPUT
+    // ========================================================
 
-    output logic [31:0] memory_data_out,
+    output logic        valid_out,
+    output logic [31:0] pc_out,
+    output logic [31:0] instr_out,
+
+    // ========================================================
+    // DATA TO WB STAGE
+    // ========================================================
+
     output logic [31:0] alu_result_out,
+    output logic [31:0] mem_data_out,
     output logic [31:0] pc_plus4_out,
+    output logic [4:0]  rd_out,
 
-    output logic [4:0] rd_out,
+    // ========================================================
+    // WB CONTROL OUTPUT
+    // ========================================================
 
     output logic       reg_write_out,
     output logic [1:0] wb_sel_out
@@ -36,37 +53,40 @@ module mem_wb (
 
     always_ff @(posedge clk or posedge rst) begin
 
-        // ========================================================
-        // RESET / FLUSH
-        // ========================================================
+        if (rst) begin
 
-        if (rst || flush) begin
+            // Commit tracking
+            valid_out      <= 1'b0;
+            pc_out         <= 32'b0;
+            instr_out      <= 32'h00000013;
 
-            memory_data_out <= 32'b0;
-            alu_result_out  <= 32'b0;
-            pc_plus4_out    <= 32'b0;
+            // Data
+            alu_result_out <= 32'b0;
+            mem_data_out   <= 32'b0;
+            pc_plus4_out   <= 32'b0;
+            rd_out         <= 5'b0;
 
-            rd_out          <= 5'b0;
-
-            reg_write_out   <= 1'b0;
-            wb_sel_out      <= 2'b00;
+            // WB control
+            reg_write_out  <= 1'b0;
+            wb_sel_out     <= 2'b00;
 
         end
-
-        // ========================================================
-        // NORMAL PIPELINE ADVANCE
-        // ========================================================
-
         else begin
 
-            memory_data_out <= memory_data_in;
-            alu_result_out  <= alu_result_in;
-            pc_plus4_out    <= pc_plus4_in;
+            // Commit tracking
+            valid_out      <= valid_in;
+            pc_out         <= pc_in;
+            instr_out      <= instr_in;
 
-            rd_out          <= rd_in;
+            // Data
+            alu_result_out <= alu_result_in;
+            mem_data_out   <= mem_data_in;
+            pc_plus4_out   <= pc_plus4_in;
+            rd_out         <= rd_in;
 
-            reg_write_out   <= reg_write_in;
-            wb_sel_out      <= wb_sel_in;
+            // WB control
+            reg_write_out  <= reg_write_in;
+            wb_sel_out     <= wb_sel_in;
 
         end
 
